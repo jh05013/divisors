@@ -31,7 +31,7 @@ fn get_divisors_standard(n: u64) -> Vec<u64> {
     let mut v = Vec::new();
     let n_sqrt = (n as f64).sqrt() as u64 + 1;
 
-    for i in 2..n_sqrt {
+    for i in 1..n_sqrt {
         if  n % i == 0 {
             if n / i == i {
                 v.push(i);

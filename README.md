@@ -1,5 +1,12 @@
-# Divisors
-A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
+# Divisors-fixed
+This is a clone of the `divisors` crate (which has not been maintained since 2019) with the following differences:
+- The bug has been fixed for `n = 2`
+- The function was changed to use the proper definition of divisors, so it includes 1 and `n`
+
+The original crate says:
+
+> A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
+
 ## Example
 ``` Rust
 use std::time::{Instant};
@@ -13,7 +20,7 @@ fn main() {
 }
 /* Output:
 finding divisors of 934832147123321
-time = 663.484µs, divisors = [19, 5011, 63397, 95209, 154877, 1204543, 2942663, 317682367, 776088647, 6035964973, 9818737169, 14745684293, 186556006211, 49201691953859]
+time = 663.484µs, divisors = [1, 19, 5011, 63397, 95209, 154877, 1204543, 2942663, 317682367, 776088647, 6035964973, 9818737169, 14745684293, 186556006211, 49201691953859, 934832147123321]
 */
 ```
 ## Usage

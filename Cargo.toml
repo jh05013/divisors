@@ -1,13 +1,13 @@
 [package]
-name = "divisors"
-version = "0.2.1"
-authors = ["uccidibuti <lorenzo@vannucci.io>"]
-description = "A blazing fast library to find all divisors of a natural number."
+name = "divisors-fixed"
+version = "0.3.1"
+authors = ["jh05013 <jhztfs@gmail.com>"]
+description = "A fixed version of the divisors crate"
 license = "MIT"
-documentation = "https://docs.rs/divisors/"
-repository = "https://github.com/uccidibuti/divisors"
+documentation = "https://docs.rs/divisors-fixed/"
+repository = "https://github.com/jh05013/divisors"
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 categories = ["mathematics", "algorithms"]
 
 [lib]
@@ -16,10 +16,9 @@ crate-type = ["rlib"]
 
 
 [dependencies]
-num = "0.2"
+num-traits = "0.2.18"
 
 [dev-dependencies]
-rand = "^0.6.5"
 criterion = "0.2"
 
 [[bench]]

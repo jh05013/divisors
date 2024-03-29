@@ -2,7 +2,7 @@
 //!
 //! divisors is a blazing fast library to get all divisors of a natural number.
 
-use num::{Unsigned, NumCast, PrimInt};
+use num_traits::{Unsigned, NumCast, PrimInt};
 use std::fmt::Display;
 
 pub trait Num: NumCast + Unsigned + Copy + PrimInt + Display {}
@@ -30,6 +30,9 @@ impl Num for usize {}
 /// }
 /// ```
 pub fn get_divisors<T: Num>(n: T) -> Vec<T> {
+    if n == T::zero() {
+        return vec![];
+    }
     
     let _0: T = T::zero();
     let _1: T = T::one();
@@ -74,10 +77,11 @@ pub fn get_divisors<T: Num>(n: T) -> Vec<T> {
         push_new_divisors(&mut v, v_len, _n);
     }
 
-    if v.len() > 1 {
-        v.sort();
-        v.pop();
+    if v.is_empty() {
+        v.push(n);
     }
+    if n != _1 { v.push(_1);    }
+    v.sort();
     
     v
 }

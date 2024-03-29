@@ -1,22 +1,27 @@
 extern crate divisors;
-extern crate rand;
 
-use rand::prelude::*;
+fn do_test(n: u32) {
+    assert_eq!(divisors::get_divisors(n), get_divisors_standard(n));
+}
 
 #[test]
-fn test() {
-    let mut rng = rand::thread_rng();
-    
-    for _i in 0..10000 {
-        let n: u32 = rng.gen::<u32>();
-        if n == 0 { continue; }
-        let v0 = divisors::get_divisors(n);
-        let v1 = get_divisors_standard(n);
+fn test_smallest() {
+    for i in 0..10 {
+        do_test(i);
+    }
+}
 
-        
-        for i in 0..v0.len() {
-            assert!(v0[i] == v1[i]);        
-        }
+#[test]
+fn test_small() {
+    for i in 10..100000 {
+        do_test(i);
+    }
+}
+
+#[test]
+fn test_large() {
+    for i in u32::MAX-1..=u32::MAX {
+        do_test(i);
     }
 }
 
@@ -25,7 +30,7 @@ fn get_divisors_standard(n: u32) -> Vec<u32> {
     let mut v = Vec::new();
     let n_sqrt = (n as f32).sqrt() as u32 + 1;
 
-    for i in 2..n_sqrt {
+    for i in 1..n_sqrt {
         if  n % i == 0 {
             if n / i == i {
                 v.push(i);
