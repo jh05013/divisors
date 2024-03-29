@@ -27,7 +27,7 @@ time = 663.484µs, divisors = [1, 19, 5011, 63397, 95209, 154877, 1204543, 29426
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-divisors = "0.3.1"
+divisors = "0.3.0"
 ```
 
 ## Documentations

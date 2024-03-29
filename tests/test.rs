@@ -1,7 +1,7 @@
 extern crate divisors_fixed;
 
 fn do_test(n: u32) {
-    assert_eq!(divisors::get_divisors(n), get_divisors_standard(n));
+    assert_eq!(divisors_fixed::get_divisors(n), get_divisors_standard(n));
 }
 
 #[test]
@@ -20,7 +20,7 @@ fn test_small() {
 
 #[test]
 fn test_large() {
-    for i in u32::MAX-1..=u32::MAX {
+    for i in u32::MAX - 1..=u32::MAX {
         do_test(i);
     }
 }
@@ -31,11 +31,10 @@ fn get_divisors_standard(n: u32) -> Vec<u32> {
     let n_sqrt = (n as f32).sqrt() as u32 + 1;
 
     for i in 1..n_sqrt {
-        if  n % i == 0 {
+        if n % i == 0 {
             if n / i == i {
                 v.push(i);
-            }
-            else {
+            } else {
                 v.push(i);
                 v.push(n / i);
             }
