@@ -34,7 +34,7 @@ divisors = "0.3.1"
 ```sh
 cargo doc --no-deps --open
 ```
-[link](https://docs.rs/divisors/) 
+[link](https://docs.rs/divisors_fixed/) 
 
 ## Benchmarks
 ```sh

@@ -1,10 +1,10 @@
 [package]
-name = "divisors-fixed"
-version = "0.3.1"
+name = "divisors_fixed"
+version = "0.3.0"
 authors = ["jh05013 <jhztfs@gmail.com>"]
 description = "A fixed version of the divisors crate"
 license = "MIT"
-documentation = "https://docs.rs/divisors-fixed/"
+documentation = "https://docs.rs/divisors_fixed/"
 repository = "https://github.com/jh05013/divisors"
 readme = "README.md"
 edition = "2021"
