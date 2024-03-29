@@ -1,4 +1,4 @@
-extern crate divisors;
+extern crate divisors_fixed;
 
 fn do_test(n: u32) {
     assert_eq!(divisors::get_divisors(n), get_divisors_standard(n));

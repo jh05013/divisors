@@ -11,7 +11,7 @@ edition = "2021"
 categories = ["mathematics", "algorithms"]
 
 [lib]
-name = "divisors"
+name = "divisors_fixed"
 crate-type = ["rlib"]
 
 

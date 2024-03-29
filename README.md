@@ -1,9 +1,9 @@
 # Divisors-fixed
-This is a clone of the `divisors` crate (which has not been maintained since 2019) with the following differences:
+This is a clone of the `divisors` crate with the following differences:
 - The bug has been fixed for `n = 2`
 - The function was changed to use the proper definition of divisors, so it includes 1 and `n`
 
-The original crate says:
+[The original crate](https://github.com/uccidibuti/divisors) says:
 
 > A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
 
@@ -27,7 +27,7 @@ time = 663.484µs, divisors = [1, 19, 5011, 63397, 95209, 154877, 1204543, 29426
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-divisors = "0.2.1"
+divisors = "0.3.1"
 ```
 
 ## Documentations

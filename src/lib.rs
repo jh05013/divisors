@@ -1,6 +1,13 @@
-//! # divisors
+//! # divisors_fixed
 //!
-//! divisors is a blazing fast library to get all divisors of a natural number.
+//! This is a clone of the divisors crate with the following differences:
+//! 
+//! - The bug has been fixed for n = 2
+//! - The function was changed to use the proper definition of divisors, so it includes 1 and n
+//! 
+//! [The original crate](https://github.com/uccidibuti/divisors) says:
+//! 
+//! > A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
 
 use num_traits::{Unsigned, NumCast, PrimInt};
 use std::fmt::Display;
@@ -14,7 +21,7 @@ impl Num for u64 {}
 impl Num for u128 {}
 impl Num for usize {}
 
-/// Return a vector with all divisors ordered of n in range (1, n-1).
+/// Return a vector with all divisors ordered of n in range [1, n].
 ///
 /// # Example
 ///
@@ -97,7 +104,7 @@ pub fn get_divisors<T: Num>(n: T) -> Vec<T> {
 ///     assert_eq!(n_sqrt, 8);
 /// }
 /// ```
-pub fn approximated_sqrt<T: Num>(n: T) -> T {
+fn approximated_sqrt<T: Num>(n: T) -> T {
     let _0: T = T::zero();
     let _1: T = T::one();
     let mut num_bits = (std::mem::size_of::<T>() << 3) - 1;
