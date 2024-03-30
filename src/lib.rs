@@ -12,7 +12,10 @@
 pub trait Divisors: Sized {
     fn divisors_unordered(&self) -> Vec<Self>;
 
-    fn divisors(&self) -> Vec<Self> where Self: Ord {
+    fn divisors(&self) -> Vec<Self>
+    where
+        Self: Ord,
+    {
         let mut v = self.divisors_unordered();
         v.sort();
         v
@@ -45,6 +48,12 @@ macro_rules! impl_divisors {
                     }
                 }
 
+                fn candidates() -> impl Iterator<Item = $t> {
+                    [2, 3]
+                        .into_iter()
+                        .chain((5..).step_by(6).flat_map(|d| [d, d + 2]))
+                }
+
                 if *self == 0 {
                     return vec![];
                 }
@@ -52,7 +61,7 @@ macro_rules! impl_divisors {
                 let mut v = vec![1];
 
                 let mut n = *self;
-                for d in std::iter::once(2).chain((3..).step_by(2)) {
+                for d in candidates() {
                     if d * d > n {
                         break;
                     }
