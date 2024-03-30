@@ -9,127 +9,70 @@
 //!
 //! > A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
 
-use num_traits::{NumCast, PrimInt, Unsigned};
-use std::fmt::Display;
-use std::iter;
-
 pub trait Divisors: Sized {
-    fn divisors(&self) -> Vec<Self>;
-}
+    fn divisors_unordered(&self) -> Vec<Self>;
 
-impl Divisors for u32 {
-    fn divisors(&self) -> Vec<Self> {
-        fn repeat_division(mut n: u32, d: u32) -> (u32, usize) {
-            for rep in 0.. {
-                // this will be optimized by LLVM
-                let (new_n, rem) = (n / d, n % d);
-
-                if rem != 0 {
-                    return (n, rep);
-                }
-                n = new_n;
-            }
-            unreachable!();
-        }
-
-        if *self == 0 {
-            return vec![];
-        }
-
-        let mut v = vec![1];
-
-        let mut n = *self;
-        for d in std::iter::once(2).chain((3..).step_by(2)) {
-            if d * d > n {
-                break;
-            }
-            let (new_n, rep) = repeat_division(n, d);
-            n = new_n;
-
-            v.reserve(v.len() * (rep + 1));
-            for i in 0..v.len() * rep {
-                let vi = unsafe { v.get_unchecked(i) };
-                let new_div = vi * d;
-                v.push(new_div);
-            }
-        }
-        if n > 1 {
-            v.reserve(v.len() * 2);
-            for i in 0..v.len() {
-                let vi = unsafe { v.get_unchecked(i) };
-                let new_div = vi * n;
-                v.push(new_div);
-            }
-        }
-
-        v.sort_unstable();
+    fn divisors(&self) -> Vec<Self> where Self: Ord {
+        let mut v = self.divisors_unordered();
+        v.sort();
         v
     }
 }
 
-impl Divisors for u64 {
-    fn divisors(&self) -> Vec<Self> {
-        fn repeat_division(mut n: u64, d: u64) -> (u64, usize) {
-            for rep in 0.. {
-                // this will be optimized by LLVM
-                let (new_n, rem) = (n / d, n % d);
+macro_rules! impl_divisors {
+    ($t:ty) => {
+        impl Divisors for $t {
+            fn divisors_unordered(&self) -> Vec<Self> {
+                fn repeat_division(mut n: $t, d: $t) -> ($t, usize) {
+                    for rep in 0.. {
+                        // this will be optimized by LLVM
+                        let (new_n, rem) = (n / d, n % d);
 
-                if rem != 0 {
-                    return (n, rep);
+                        if rem != 0 {
+                            return (n, rep);
+                        }
+                        n = new_n;
+                    }
+                    unreachable!();
                 }
-                n = new_n;
-            }
-            unreachable!();
-        }
 
-        if *self == 0 {
-            return vec![];
-        }
+                fn multiply_and_extend(v: &mut Vec<$t>, multiplier: $t, rep: usize) {
+                    v.reserve(v.len() * (rep + 1));
+                    for i in 0..v.len() * rep {
+                        let vi = unsafe { v.get_unchecked(i) };
+                        let new_div = vi * multiplier;
+                        v.push(new_div);
+                    }
+                }
 
-        let mut v = vec![1];
+                if *self == 0 {
+                    return vec![];
+                }
 
-        let mut n = *self;
-        for d in std::iter::once(2).chain((3..).step_by(2)) {
-            if d * d > n {
-                break;
-            }
-            let (new_n, rep) = repeat_division(n, d);
-            n = new_n;
+                let mut v = vec![1];
 
-            v.reserve(v.len() * (rep + 1));
-            for i in 0..v.len() * rep {
-                let vi = unsafe { v.get_unchecked(i) };
-                let new_div = vi * d;
-                v.push(new_div);
-            }
-        }
-        if n > 1 {
-            v.reserve(v.len() * 2);
-            for i in 0..v.len() {
-                let vi = unsafe { v.get_unchecked(i) };
-                let new_div = vi * n;
-                v.push(new_div);
+                let mut n = *self;
+                for d in std::iter::once(2).chain((3..).step_by(2)) {
+                    if d * d > n {
+                        break;
+                    }
+                    let (new_n, rep) = repeat_division(n, d);
+                    n = new_n;
+                    multiply_and_extend(&mut v, d, rep);
+                }
+                if n > 1 {
+                    multiply_and_extend(&mut v, n, 1);
+                }
+
+                v
             }
         }
-
-        v.sort_unstable();
-        v
-    }
+    };
 }
 
-/// Return a vector with all divisors ordered of n in range [1, n].
-///
-/// # Example
-///
-/// ```
-/// use std::time::{Instant};
-///
-/// let n: u128 = 934832147123321;
-/// println!("finding divisors of {}", n);
-/// let start_time = Instant::now();
-/// let v = divisors_fixed::get_divisors(n);
-/// println!("time = {:?}, divisors = {:?}", start_time.elapsed(), v);
-/// ```
-pub fn get_divisors(n: u32) -> Vec<u32> {
-    n.divisors()
-}
+impl_divisors!(u8);
+impl_divisors!(u16);
+impl_divisors!(u32);
+impl_divisors!(u64);
+impl_divisors!(u128);
+impl_divisors!(usize);

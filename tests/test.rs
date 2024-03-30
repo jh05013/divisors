@@ -1,7 +1,8 @@
 extern crate divisors_fixed;
+use divisors_fixed::Divisors;
 
 fn do_test(n: u32) {
-    assert_eq!(divisors_fixed::get_divisors(n), get_divisors_standard(n));
+    assert_eq!(n.divisors(), get_divisors_standard(n));
 }
 
 #[test]

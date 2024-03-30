@@ -16,7 +16,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
     c.bench_function(
         &format!("finding divisors of {} with get_divisors_standard", n0),
-        |b| b.iter(|| get_divisors_standard(black_box(12345678956u64))),
+        move |b| b.iter(|| get_divisors_standard(black_box(n0))),
     );
 
     c.bench_function(
@@ -25,7 +25,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
     c.bench_function(
         &format!("finding divisors of {} with get_divisors_standard", n1),
-        |b| b.iter(|| get_divisors_standard(black_box(93291493211u64))),
+        move |b| b.iter(|| get_divisors_standard(black_box(n1))),
     );
 
     c.bench_function(
@@ -34,7 +34,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
     c.bench_function(
         &format!("finding divisors of {} with get_divisors_standard", n2),
-        |b| b.iter(|| get_divisors_standard(black_box(11111111111u64))),
+        move |b| b.iter(|| get_divisors_standard(black_box(n2))),
     );
 }
 

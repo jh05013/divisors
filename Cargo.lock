@@ -149,7 +149,6 @@ name = "divisors_fixed"
 version = "0.3.0"
 dependencies = [
  "criterion",
- "num-traits",
 ]
 
 [[package]]
