@@ -58,6 +58,15 @@ macro_rules! impl_divisors {
                     }
                 }
 
+                #[inline]
+                fn candidates() -> impl Iterator<Item = $t> {
+                    [2, 3, 5].into_iter().chain(
+                        (7..).step_by(30).flat_map(|d| {
+                            [d, d + 4, d + 6, d + 10, d + 12, d + 16, d + 22, d + 24]
+                        }),
+                    )
+                }
+
                 if *self == 0 {
                     return vec![];
                 }
@@ -65,10 +74,7 @@ macro_rules! impl_divisors {
                 let mut v = vec![1];
 
                 let mut n = *self;
-                for d in [<$t>::from(2u8), 3]
-                    .into_iter()
-                    .chain((5..).step_by(6).flat_map(|d| [d, d + 2]))
-                {
+                for d in candidates() {
                     if !d.checked_mul(d).is_some_and(|res| res <= n) {
                         break;
                     }
@@ -94,6 +100,7 @@ impl_divisors!(u64);
 impl_divisors!(u128);
 impl_divisors!(usize);
 
+#[cfg(test)]
 mod test {
     use crate::Divisors;
 
