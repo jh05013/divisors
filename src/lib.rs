@@ -65,13 +65,14 @@ macro_rules! impl_divisors {
                 let mut v = vec![1];
 
                 let mut n = *self;
-                for d in [2, 3]
+                for d in [<$t>::from(2u8), 3]
                     .into_iter()
                     .chain((5..).step_by(6).flat_map(|d| [d, d + 2]))
                 {
-                    if d * d > n {
+                    if !d.checked_mul(d).is_some_and(|res| res <= n) {
                         break;
                     }
+
                     let (new_n, rep) = repeat_division(n, d);
                     n = new_n;
                     multiply_and_extend(&mut v, d, rep);
@@ -115,8 +116,8 @@ mod test {
     }
 
     #[test]
-    fn test_large() {
-        for i in u32::MAX - 1..=u32::MAX {
+    fn test_near_max() {
+        for i in u32::MAX - 1000..=u32::MAX {
             do_test(i);
         }
     }
