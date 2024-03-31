@@ -1,11 +1,16 @@
 # Divisors-fixed
-This is a clone of the `divisors` crate with the following differences:
-- The bug has been fixed for `n = 2`
-- The function was changed to use the proper definition of divisors, so it includes 1 and `n`
+A minimalistic crate for finding all divisors of an integer.
+Although its worst-case time complexity is (currently)
+still O(sqrt(n)), It is practically much faster than the
+naive method of trying every integers under sqrt(n).
 
-[The original crate](https://github.com/uccidibuti/divisors) says:
+This library works with `u8`, `u16`, `u32`, `u64`, `u128`,
+and `usize` types.
 
-> A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
+This originally started as a clone of the
+[divisors](https://github.com/uccidibuti/divisors) crate with
+bug fixes (hence the name), but has since evolved with
+API changes and reimplementations.
 
 ## Example
 ``` Rust
@@ -23,12 +28,12 @@ Output:
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-divisors = "0.3.0"
+divisors = "0.4.0"
 ```
 
 ## Documentations
 ```sh
-cargo doc --no-deps --open
+cargo doc --open
 ```
 [link](https://docs.rs/divisors_fixed/) 
 
@@ -42,9 +47,5 @@ cargo bench
 cargo test
 ```
 
-## Example
-```sh
-cargo run --release --example example
-```
 ## License
 MIT.

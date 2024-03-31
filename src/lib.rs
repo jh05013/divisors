@@ -8,10 +8,16 @@
 //! This library works with `u8`, `u16`, `u32`, `u64`, `u128`,
 //! and `usize` types.
 //!
-//! This originally started from the
+//! This originally started as a clone of the
 //! [divisors](https://github.com/uccidibuti/divisors) crate with
 //! bug fixes (hence the name), but has since evolved with
 //! API changes and reimplementations.
+//!
+//! # Example
+//! ```
+//! use divisors_fixed::Divisors;
+//! assert_eq!(12u32.divisors(), vec![1, 2, 3, 4, 6, 12]);
+//! ```
 
 /// Trait for getting all positive divisors of an integer.
 pub trait Divisors: Sized {
@@ -24,7 +30,7 @@ pub trait Divisors: Sized {
         Self: Ord,
     {
         let mut v = self.divisors_unordered();
-        v.sort();
+        v.sort_unstable();
         v
     }
 }
@@ -34,6 +40,8 @@ macro_rules! impl_divisors {
         impl Divisors for $t {
             fn divisors_unordered(&self) -> Vec<Self> {
                 #[inline]
+                /// Keeps dividing `n` by `d` until you can't.
+                /// Returns the final value of `n` and the amount divided.
                 fn repeat_division(mut n: $t, d: $t) -> ($t, usize) {
                     for rep in 0.. {
                         // this will be optimized by LLVM
@@ -48,17 +56,19 @@ macro_rules! impl_divisors {
                 }
 
                 #[inline]
+                /// Expands the vector `v` by `rep` times by multiplying
+                /// each element by `multiplier`.
                 fn multiply_and_extend(v: &mut Vec<$t>, multiplier: $t, rep: usize) {
                     v.reserve(v.len() * (rep + 1));
                     for i in 0..v.len() * rep {
                         // SAFETY: i < v.len() is always true
                         let vi = unsafe { v.get_unchecked(i) };
-                        let new_div = vi * multiplier;
-                        v.push(new_div);
+                        v.push(vi * multiplier);
                     }
                 }
 
                 #[inline]
+                /// Returns the possible prime number candidates.
                 fn candidates() -> impl Iterator<Item = $t> {
                     [2, 3, 5].into_iter().chain(
                         (7..).step_by(30).flat_map(|d| {
@@ -71,23 +81,22 @@ macro_rules! impl_divisors {
                     return vec![];
                 }
 
-                let mut v = vec![1];
+                let mut divisors = vec![1];
 
                 let mut n = *self;
                 for d in candidates() {
                     if !d.checked_mul(d).is_some_and(|res| res <= n) {
                         break;
                     }
-
                     let (new_n, rep) = repeat_division(n, d);
                     n = new_n;
-                    multiply_and_extend(&mut v, d, rep);
+                    multiply_and_extend(&mut divisors, d, rep);
                 }
                 if n > 1 {
-                    multiply_and_extend(&mut v, n, 1);
+                    multiply_and_extend(&mut divisors, n, 1);
                 }
 
-                v
+                divisors
             }
         }
     };
