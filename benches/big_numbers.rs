@@ -3,6 +3,7 @@ extern crate criterion;
 use criterion::{black_box, Criterion};
 
 extern crate divisors_fixed;
+use divisors_fixed::Divisors;
 
 fn criterion_benchmark(c: &mut Criterion) {
     let n0: u64 = 12345678956u64;
@@ -11,29 +12,29 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function(
         &format!("finding divisors of {} with get_divisors", n0),
-        |b| b.iter(|| divisors_fixed::get_divisors(black_box(12345678956u64))),
+        move |b| b.iter(|| black_box(n0).divisors()),
     );
     c.bench_function(
         &format!("finding divisors of {} with get_divisors_standard", n0),
-        |b| b.iter(|| get_divisors_standard(black_box(12345678956u64))),
+        move |b| b.iter(|| get_divisors_standard(black_box(n0))),
     );
 
     c.bench_function(
         &format!("finding divisors of {} with get_divisors", n1),
-        |b| b.iter(|| divisors_fixed::get_divisors(black_box(193291493211u64))),
+        move |b| b.iter(|| black_box(n1).divisors()),
     );
     c.bench_function(
         &format!("finding divisors of {} with get_divisors_standard", n1),
-        |b| b.iter(|| get_divisors_standard(black_box(93291493211u64))),
+        move |b| b.iter(|| get_divisors_standard(black_box(n1))),
     );
 
     c.bench_function(
         &format!("finding divisors of {} with get_divisors", n2),
-        |b| b.iter(|| divisors_fixed::get_divisors(black_box(11111111111u64))),
+        move |b| b.iter(|| black_box(n2).divisors()),
     );
     c.bench_function(
         &format!("finding divisors of {} with get_divisors_standard", n2),
-        |b| b.iter(|| get_divisors_standard(black_box(11111111111u64))),
+        move |b| b.iter(|| get_divisors_standard(black_box(n2))),
     );
 }
 

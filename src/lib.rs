@@ -1,112 +1,159 @@
 //! # divisors_fixed
 //!
-//! This is a clone of the divisors crate with the following differences:
+//! A minimalistic crate for finding all divisors of an integer.
+//! Although its worst-case time complexity is (currently)
+//! still O(sqrt(n)), It is practically much faster than the
+//! naive method of trying every integers under sqrt(n).
 //!
-//! - The bug has been fixed for n = 2
-//! - The function was changed to use the proper definition of divisors, so it includes 1 and n
+//! This library works with `u8`, `u16`, `u32`, `u64`, `u128`,
+//! and `usize` types.
 //!
-//! [The original crate](https://github.com/uccidibuti/divisors) says:
+//! This originally started as a clone of the
+//! [divisors](https://github.com/uccidibuti/divisors) crate with
+//! bug fixes (hence the name), but has since evolved with
+//! API changes and reimplementations.
 //!
-//! > A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
+//! # Example
+//! ```
+//! use divisors_fixed::Divisors;
+//! assert_eq!(12u32.divisors(), vec![1, 2, 3, 4, 6, 12]);
+//! ```
 
-use num_traits::{NumCast, PrimInt, Unsigned};
-use std::fmt::Display;
+/// Trait for getting all positive divisors of an integer.
+pub trait Divisors: Sized {
+    /// Returns the list of divisors of `self` in no particular order.
+    fn divisors_unordered(&self) -> Vec<Self>;
 
-pub trait Num: NumCast + Unsigned + Copy + PrimInt + Display {}
-
-impl Num for u8 {}
-impl Num for u16 {}
-impl Num for u32 {}
-impl Num for u64 {}
-impl Num for u128 {}
-impl Num for usize {}
-
-/// Return a vector with all divisors ordered of n in range [1, n].
-///
-/// # Example
-///
-/// ```
-/// use std::time::{Instant};
-///
-/// let n: u128 = 934832147123321;
-/// println!("finding divisors of {}", n);
-/// let start_time = Instant::now();
-/// let v = divisors_fixed::get_divisors(n);
-/// println!("time = {:?}, divisors = {:?}", start_time.elapsed(), v);
-/// ```
-pub fn get_divisors<T: Num>(n: T) -> Vec<T> {
-    if n == T::zero() {
-        return vec![];
+    /// Returns the list of divisors of `self` in the ascending order.
+    fn divisors(&self) -> Vec<Self>
+    where
+        Self: Ord,
+    {
+        let mut v = self.divisors_unordered();
+        v.sort_unstable();
+        v
     }
+}
 
-    let zero: T = T::zero();
-    let one: T = T::one();
-    let two: T = T::from(2).unwrap();
-    let mut _n = n;
-    let mut v: Vec<T> = Vec::new();
+macro_rules! impl_divisors {
+    ($t:ty) => {
+        impl Divisors for $t {
+            fn divisors_unordered(&self) -> Vec<Self> {
+                #[inline]
+                /// Keeps dividing `n` by `d` until you can't.
+                /// Returns the final value of `n` and the amount divided.
+                fn repeat_division(mut n: $t, d: $t) -> ($t, usize) {
+                    for rep in 0.. {
+                        // this will be optimized by LLVM
+                        let (new_n, rem) = (n / d, n % d);
 
-    let mut count_divisors_2: usize = 0;
-    while _n & one == zero {
-        v.push(two << count_divisors_2);
-        count_divisors_2 += 1;
-        _n = _n >> 1;
-    }
+                        if rem != 0 {
+                            return (n, rep);
+                        }
+                        n = new_n;
+                    }
+                    unreachable!();
+                }
 
-    let mut _x: T = T::from(3).unwrap();
-    let mut _n_sqrt: T = approximated_sqrt(_n);
-    while _x < _n_sqrt {
-        let mut _pow_x = _x;
-        let v_len = v.len();
-        let mut x_is_a_divisors = false;
+                #[inline]
+                /// Expands the vector `v` by `rep` times by multiplying
+                /// each element by `multiplier`.
+                fn multiply_and_extend(v: &mut Vec<$t>, multiplier: $t, rep: usize) {
+                    v.reserve(v.len() * (rep + 1));
+                    for i in 0..v.len() * rep {
+                        // SAFETY: i < v.len() is always true
+                        let vi = unsafe { v.get_unchecked(i) };
+                        v.push(vi * multiplier);
+                    }
+                }
 
-        let mut pow_x_is_a_divisors = _n % _x == zero;
-        while pow_x_is_a_divisors {
-            _n = _n.div(_x);
-            v.push(_pow_x);
-            push_new_divisors(&mut v, v_len, _pow_x);
-            pow_x_is_a_divisors = _n % _x == zero;
-            if pow_x_is_a_divisors {
-                _pow_x = _pow_x.mul(_x);
+                #[inline]
+                /// Returns the possible prime number candidates.
+                fn candidates() -> impl Iterator<Item = $t> {
+                    [2, 3, 5].into_iter().chain(
+                        (7..).step_by(30).flat_map(|d| {
+                            [d, d + 4, d + 6, d + 10, d + 12, d + 16, d + 22, d + 24]
+                        }),
+                    )
+                }
+
+                if *self == 0 {
+                    return vec![];
+                }
+
+                let mut divisors = vec![1];
+
+                let mut n = *self;
+                for d in candidates() {
+                    if !d.checked_mul(d).is_some_and(|res| res <= n) {
+                        break;
+                    }
+                    let (new_n, rep) = repeat_division(n, d);
+                    n = new_n;
+                    multiply_and_extend(&mut divisors, d, rep);
+                }
+                if n > 1 {
+                    multiply_and_extend(&mut divisors, n, 1);
+                }
+
+                divisors
             }
-            x_is_a_divisors = true;
         }
-        _x = _x + two;
-        if x_is_a_divisors {
-            _n_sqrt = approximated_sqrt(_n);
-        }
-    }
-
-    if _n > one && _n != n {
-        let v_len = v.len();
-        v.push(_n);
-        push_new_divisors(&mut v, v_len, _n);
-    }
-
-    if v.is_empty() {
-        v.push(n);
-    }
-    if n != one {
-        v.push(one);
-    }
-    v.sort();
-
-    v
+    };
 }
 
-fn approximated_sqrt<T: Num>(n: T) -> T {
-    let zero: T = T::zero();
-    let one: T = T::one();
-    let mut num_bits = (std::mem::size_of::<T>() << 3) - 1;
-    while ((n >> num_bits) & one) == zero {
-        num_bits -= 1;
+impl_divisors!(u8);
+impl_divisors!(u16);
+impl_divisors!(u32);
+impl_divisors!(u64);
+impl_divisors!(u128);
+impl_divisors!(usize);
+
+#[cfg(test)]
+mod test {
+    use crate::Divisors;
+
+    fn do_test(n: u32) {
+        assert_eq!(n.divisors(), get_divisors_standard(n));
     }
 
-    one << ((num_bits >> 1) + 1)
-}
+    #[test]
+    fn test_smallest() {
+        for i in 0..10 {
+            do_test(i);
+        }
+    }
 
-/// Iterate on v from 0 to v_len and for each element e: push (e * _x) in v.
-fn push_new_divisors<T: Num>(v: &mut Vec<T>, v_len: usize, _x: T) {
-    for i in 0..v_len {
-        v.push(_x.mul(unsafe { *v.get_unchecked(i) }));
+    #[test]
+    fn test_small() {
+        for i in 10..100000 {
+            do_test(i);
+        }
+    }
+
+    #[test]
+    fn test_near_max() {
+        for i in u32::MAX - 1000..=u32::MAX {
+            do_test(i);
+        }
+    }
+
+    /// geeksforgeeks solution: https://www.geeksforgeeks.org/find-divisors-natural-number-set-1/
+    fn get_divisors_standard(n: u32) -> Vec<u32> {
+        let mut v = Vec::new();
+        let n_sqrt = (n as f32).sqrt() as u32 + 1;
+
+        for i in 1..n_sqrt {
+            if n % i == 0 {
+                if n / i == i {
+                    v.push(i);
+                } else {
+                    v.push(i);
+                    v.push(n / i);
+                }
+            }
+        }
+        v.sort();
+        v
     }
 }

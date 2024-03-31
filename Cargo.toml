@@ -1,8 +1,8 @@
 [package]
 name = "divisors_fixed"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["jh05013 <jhztfs@gmail.com>"]
-description = "A fixed version of the divisors crate"
+description = "A fixed & enhanced version of the divisors crate"
 license = "MIT"
 documentation = "https://docs.rs/divisors_fixed/"
 repository = "https://github.com/jh05013/divisors"
@@ -16,7 +16,6 @@ crate-type = ["rlib"]
 
 
 [dependencies]
-num-traits = "0.2.18"
 
 [dev-dependencies]
 criterion = "0.2"

@@ -1,38 +1,39 @@
 # Divisors-fixed
-This is a clone of the `divisors` crate with the following differences:
-- The bug has been fixed for `n = 2`
-- The function was changed to use the proper definition of divisors, so it includes 1 and `n`
+A minimalistic crate for finding all divisors of an integer.
+Although its worst-case time complexity is (currently)
+still O(sqrt(n)), It is practically much faster than the
+naive method of trying every integers under sqrt(n).
 
-[The original crate](https://github.com/uccidibuti/divisors) says:
+This library works with `u8`, `u16`, `u32`, `u64`, `u128`,
+and `usize` types.
 
-> A blazing fast Rust library to find all divisors of a natural number. This library works with u8, u16, u32, u64, u128 and usize types.
+This originally started as a clone of the
+[divisors](https://github.com/uccidibuti/divisors) crate with
+bug fixes (hence the name), but has since evolved with
+API changes and reimplementations.
 
 ## Example
 ``` Rust
-use std::time::{Instant};
+let n = 240u32;
+println!("{:?}", n.divisors_unordered());
+println!("{:?}", n.divisors());
 
-fn main() {
-    let n: u128 = 934832147123321;
-    println!("finding divisors of {}", n);
-    let start_time = Instant::now();
-    let v = divisors::get_divisors(n);
-    println!("time = {:?}, divisors = {:?}", start_time.elapsed(), v);
-}
-/* Output:
-finding divisors of 934832147123321
-time = 663.484µs, divisors = [1, 19, 5011, 63397, 95209, 154877, 1204543, 2942663, 317682367, 776088647, 6035964973, 9818737169, 14745684293, 186556006211, 49201691953859, 934832147123321]
+/*
+Output:
+[1, 2, 4, 8, 16, 3, 6, 12, 24, 48, 5, 10, 20, 40, 80, 15, 30, 60, 120, 240]
+[1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 16, 20, 24, 30, 40, 48, 60, 80, 120, 240]
 */
 ```
 ## Usage
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-divisors = "0.3.0"
+divisors = "0.4.0"
 ```
 
 ## Documentations
 ```sh
-cargo doc --no-deps --open
+cargo doc --open
 ```
 [link](https://docs.rs/divisors_fixed/) 
 
@@ -46,9 +47,5 @@ cargo bench
 cargo test
 ```
 
-## Example
-```sh
-cargo run --release --example example
-```
 ## License
 MIT.
